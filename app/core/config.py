@@ -7,5 +7,6 @@ class Settings(BaseSettings):
         "DATABASE_URL",
         "postgresql+asyncpg://postgres:123456@localhost:5432/postgres"
     )
+    API_KEY: str = os.getenv("API_KEY", "dev-secret-key")
 
 settings = Settings()
