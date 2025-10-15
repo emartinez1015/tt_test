@@ -1,7 +1,7 @@
 
 # 🧩 Project Management API
 
-A lightweight **FastAPI** application for managing **projects** and their associated **tasks**.  
+A lightweight **FastAPI** application for managing **projects** and their associated **taunsks**.  
 It allows you to create, update, and delete projects, and manage tasks under each project — all through a clean and efficient REST API.
 
 ---
@@ -90,6 +90,17 @@ uvicorn app.main:app --reload
 The app will start at:
 
 ```
+http://127.0.0.1:8000
+```
+## Run with Docker Compose
+
+This project can also be run using Docker Compose:
+
+Make sure you have Docker and Docker Compose installed.
+
+```
+docker-compose up -d --build
+
 http://127.0.0.1:8000
 ```
 
