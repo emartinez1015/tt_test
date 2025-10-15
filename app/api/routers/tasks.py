@@ -1,21 +1,32 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from fastapi import APIRouter, Depends, HTTPException
+from app.api.schemas.task import TaskOut, TaskUpdate
+from app.api.crud import tasks as crud
+from app.api.deps import get_db
 
-router = APIRouter()
-
-@router.post("/projects/{project_id}/tasks/", tags=["tasks"])
-def create_task(project_id: int):
-    return {"message": f"Task created for project {project_id}"}
-
-@router.get("/projects/{project_id}/tasks/", tags=["tasks"])
-def read_tasks_for_project(project_id: int):
-    return {"message": f"List of tasks for project {project_id}"}
+router = APIRouter(prefix="/tasks", tags=["Tasks"])
 
 
-@router.put("/tasks/{task_id}", tags=["tasks"])
-def update_task(task_id: int):
-    return {"message": f"Task {task_id} updated"}
+@router.put("/{task_id}", response_model=TaskOut)
+async def update_task(
+    task_id: int,
+    payload: TaskUpdate,
+    db: AsyncSession = Depends(get_db)
+):
+    task = await crud.get_task(db, task_id)
+    if not task:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
 
-@router.delete("/tasks/{task_id}", tags=["tasks"])
-def delete_task(task_id: int):
-    return {"message": f"Task {task_id} deleted"}
+    updated_task = await crud.update_task(db, task, payload)
+    return updated_task
+
+
+@router.delete("/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_task(task_id: int, db: AsyncSession = Depends(get_db)):
+    task = await crud.get_task(db, task_id)
+    if not task:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Task not found")
+
+    await crud.delete_task(db, task)
+    return None
